@@ -7,7 +7,7 @@ export class WebSocket extends WS {
     heartbeatTime: number = 0
     heartbeatClock?: NodeJS.Timer
 
-    static fromWebSocket(webSocket: WebSocket): WebSocket {
+    static fromWebSocket(webSocket: any): WebSocket {
         webSocket.sessionId = ''
         webSocket.clientHeartbeat = [0, 0]
         webSocket.heartbeatTime = 0
@@ -17,7 +17,5 @@ export class WebSocket extends WS {
         return webSocket
     }
 
-    sendFrame(frame: Frame) {
-        this.send(frame.build())
-    }
+    sendFrame(frame: Frame): void { }
 }
