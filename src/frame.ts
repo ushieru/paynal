@@ -6,12 +6,16 @@ export class Frame {
     constructor(
         readonly command: string,
         readonly headers: Headers,
-        readonly body?: any,
+        readonly body?: string | Buffer | object,
         readonly wantReceipt: boolean = false
     ) {
         if (wantReceipt)
-            if (this.headers.session)
-                this.headers.receipt = `${cuid()}-${this.headers.session}`
+            /**
+             * Todo: Revisar si es necesario tener session
+             * para pedir un resivo
+             */
+            // if (this.headers.session)
+            this.headers.receipt = `${cuid()}-${this.headers.session}`
     }
 
     static fromPayload(payload: Buffer | string): Frame {
@@ -71,15 +75,12 @@ export class Frame {
         frameBuilder.push(`${this.command}${Break}`)
         frameBuilder.push(headersBuilder.join(Break))
         frameBuilder.push(`${Break}${Break}`)
-        if (Buffer.isBuffer(this.body)) {
+        if (Buffer.isBuffer(this.body))
             return this.makeBuffer(frameBuilder.join(Break), this.body)
-        }
-        if (this.body && this.headers['content-type'] === 'application/json') {
+        if (this.body && typeof this.body == 'object')
             frameBuilder.push(JSON.stringify(this.body))
-        }
-        if (this.body && this.headers['content-type'] !== 'application/json') {
+        if (this.body && typeof this.body == 'string')
             frameBuilder.push(this.body)
-        }
         frameBuilder.push(Null)
         return frameBuilder.join(Break)
     }
