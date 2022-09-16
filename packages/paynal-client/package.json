@@ -6,7 +6,8 @@
   "author": "Ushieru Kokoran (https://ushieru.com/)",
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest",
+    "build": "tsc"
   },
   "dependencies": {
     "cuid": "^2.1.8"
