@@ -9,7 +9,6 @@ const ws_1 = require("ws");
 const cuid_1 = __importDefault(require("cuid"));
 const core_1 = require("@paynal/core");
 const _types_1 = require("../@types");
-const server_frames_1 = require("./server-frames");
 const web_sockets_handler_1 = require("./web-sockets-handler");
 const destination_1 = require("./destination");
 const build_config_1 = require("./build-config");
@@ -100,7 +99,7 @@ class Server extends events_1.default {
                 this.webSocketsHandler.SEND(socket, frame);
                 break;
             default:
-                const errorFrame = server_frames_1.SERVER_FRAMES.ERROR('Command not found', `Command not found: \n-----\n${frame.command}\n-----`);
+                const errorFrame = core_1.SERVER_FRAMES.ERROR('Command not found', `Command not found: \n-----\n${frame.command}\n-----`);
                 socket.sendFrame(errorFrame);
                 break;
         }
@@ -114,7 +113,7 @@ class Server extends events_1.default {
                     return;
                 if (!subscriber.socket)
                     return;
-                const frame = server_frames_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, headers, body);
+                const frame = core_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, headers, body);
                 this.emit('send', { topic, frame });
                 this.emit(subscriber.id, frame);
                 subscriber.socket.sendFrame(frame);
@@ -131,7 +130,7 @@ class Server extends events_1.default {
                     return;
                 if (!subscriber.socket)
                     return;
-                const messageFrame = server_frames_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, frame.body, frame.headers);
+                const messageFrame = core_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, frame.body, frame.headers);
                 this.emit('send', { topic, frame: messageFrame });
                 this.emit(subscriber.id, messageFrame);
                 if (this.selfSocket.sessionId != subscriber.socket.sessionId)

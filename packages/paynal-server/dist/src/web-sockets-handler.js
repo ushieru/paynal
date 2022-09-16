@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebSocketsHandler = void 0;
-const server_frames_1 = require("./server-frames");
+const core_1 = require("@paynal/core");
 class WebSocketsHandler {
     constructor(server, config) {
         this.server = server;
@@ -30,13 +30,13 @@ class WebSocketsHandler {
             heartbeat: clientHeartbeat,
             headers: frame.headers
         });
-        const connectedFrame = server_frames_1.SERVER_FRAMES.CONNECTED(socket, serverHeartbeat.join(','), this.config.serverName);
+        const connectedFrame = core_1.SERVER_FRAMES.CONNECTED(socket.sessionId, serverHeartbeat.join(','), this.config.serverName);
         socket.sendFrame(connectedFrame);
     }
     DISCONNECT(socket, frame) {
         const receipt = frame.headers.receipt;
         this.server.disconnectClient(socket, receipt);
-        const receipFrame = server_frames_1.SERVER_FRAMES.RECEIPT(receipt.toString());
+        const receipFrame = core_1.SERVER_FRAMES.RECEIPT(receipt.toString());
         socket.sendFrame(receipFrame);
     }
     SUBSCRIBE(socket, frame) {
@@ -57,12 +57,12 @@ class WebSocketsHandler {
     }
     SEND(socket, frame) {
         if (!frame.headers.destination)
-            return socket.sendFrame(server_frames_1.SERVER_FRAMES.ERROR('Header destination is required', `Header destination not found:\n-----\n${frame.build()}\n-----`));
+            return socket.sendFrame(core_1.SERVER_FRAMES.ERROR('Header destination is required', `Header destination not found:\n-----\n${frame.build()}\n-----`));
         this.server.sendClient(socket, frame.headers.destination.toString(), frame, (res) => {
             if (res && frame.headers.receipt)
-                return socket.sendFrame(server_frames_1.SERVER_FRAMES.RECEIPT(frame.headers.receipt.toString()));
+                return socket.sendFrame(core_1.SERVER_FRAMES.RECEIPT(frame.headers.receipt.toString()));
             if (!res)
-                socket.sendFrame(server_frames_1.SERVER_FRAMES.ERROR('Send error', frame.toString()));
+                socket.sendFrame(core_1.SERVER_FRAMES.ERROR('Send error', frame.toString()));
         });
     }
 }

@@ -1,7 +1,6 @@
-import { Frame } from '@paynal/core'
+import { Frame, SERVER_FRAMES } from '@paynal/core'
 import { SecureConfig, WebSocket } from '../@types'
 import { Server } from './server'
-import { SERVER_FRAMES } from './server-frames'
 
 export class WebSocketsHandler {
 
@@ -33,7 +32,7 @@ export class WebSocketsHandler {
             heartbeat: clientHeartbeat,
             headers: frame.headers
         })
-        const connectedFrame = SERVER_FRAMES.CONNECTED(socket, serverHeartbeat.join(','), this.config.serverName)
+        const connectedFrame = SERVER_FRAMES.CONNECTED(socket.sessionId, serverHeartbeat.join(','), this.config.serverName)
         socket.sendFrame(connectedFrame)
     }
 

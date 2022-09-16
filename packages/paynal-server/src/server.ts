@@ -1,7 +1,7 @@
 import EventEmitter from "events"
 import { Server as WSServer, WebSocket as ws } from 'ws'
 import cuid from "cuid"
-import { Frame, Headers, Break } from '@paynal/core'
+import { Frame, Headers, Break, SERVER_FRAMES } from '@paynal/core'
 
 import {
     WebSocket,
@@ -11,7 +11,6 @@ import {
     Command,
     Subscriber
 } from "../@types"
-import { SERVER_FRAMES } from './server-frames'
 import { WebSocketsHandler } from './web-sockets-handler'
 import {
     tokenizeDestination,
