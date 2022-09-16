@@ -17,3 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./@types/headers"), exports);
 __exportStar(require("./src/bytes"), exports);
 __exportStar(require("./src/frame"), exports);
+__exportStar(require("./src/client-frames"), exports);
+__exportStar(require("./src/server-frames"), exports);
