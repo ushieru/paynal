@@ -5,7 +5,7 @@ export const buildConfig = (config: Config): SecureConfig => {
     if (config.server === undefined) throw 'Server is required'
     const secureConfig: SecureConfig = {
         server: config.server,
-        serverName: config.serverName ?? 'Colibri/' + version,
+        serverName: config.serverName ?? 'Paynal/' + version,
         path: config.path ?? '/ws',
         heartBeat: config.heartBeat ?? [0, 0],
         heartbeatErrorMargin: config.heartbeatErrorMargin ?? 1000,
