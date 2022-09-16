@@ -1,18 +1,24 @@
-import { ClientConfig } from "../../paynal-server/src/types"
-import { CLIENT_FRAMES } from '../../paynal-server/src/client-frames'
-import { Frame } from "../../paynal-core/src/frame"
+import { ClientConfig } from "../@types/client-config"
+import { Frame, CLIENT_FRAMES, Headers } from "@paynal/core"
 
-export class Client extends WebSocket {
-    private connected = false;
-    private readonly maxWebSocketFrameSize = 16 * 1024
-    private subscriptions: { [x: string]: string } = {}
+interface ClientParams {
+    url: string | URL
+    protocols?: string | string[] | undefined
+    config?: ClientConfig
+}
+
+export class Client {
+    private webSocket: WebSocket
+    private isConnected = false;
+    // private readonly maxWebSocketFrameSize = 16 * 1024 TODO: hacerlo configurable
+    private subscriptions: { [x: string]: (frame: Frame) => void } = {}
     private readonly debug: (message?: any, ...optionalParams: any[]) => void
     private heartbeat: [number, number]
     private heartbeatTime: number = 0
     private connectedCallback?: (frame: Frame) => void
 
-    constructor(url: string, kconfig?: ClientConfig) {
-        super(url)
+    constructor({ url, protocols, config }: ClientParams) {
+        this.webSocket = new WebSocket(url, protocols)
         this.debug = config?.debug ?? console.log
         this.heartbeat = config?.heartbeat ?? [10000, 10000]
     }
@@ -21,7 +27,7 @@ export class Client extends WebSocket {
         const connectFrame = CLIENT_FRAMES.CONNECT(login, passcode)
         this.connectedCallback = callback
         this.sendFrame(connectFrame)
-        this.addEventListener('message', (data) => this.parseRequest)
+        this.webSocket.addEventListener('message', (event) => this.parseRequest(event.data))
     }
 
     /**
@@ -34,23 +40,57 @@ export class Client extends WebSocket {
         switch (frame.command) {
             case 'CONNECTED':
                 this.debug()
-                this.connected = true
+                this.isConnected = true
                 if (this.connectedCallback) this.connectedCallback(frame)
                 break;
             case 'MESSAGE':
+                const subscription = frame.headers.subscription.toString()
+                const listener = this.subscriptions[subscription]
+                if (listener) listener(frame)
                 break;
             case 'RECEIPT':
                 break;
             case 'ERROR':
                 break;
             default:
-                this.debug(`Unhandled command::${frame.command} `)
+                this.debug(`Unhandled command on frame::\n-----\n${frame.build()}\n-----`)
                 break;
         }
     }
 
     private sendFrame(frame: Frame) {
-        this.send(frame.build())
+        this.webSocket.send(frame.build())
     }
 
+    send(destination: string, headers: Headers, body?: string | Buffer) {
+        const frame = CLIENT_FRAMES.SEND(destination, headers, body)
+        this.sendFrame(frame)
+    }
+
+    subscribe(destination: string, callback: (frame: Frame) => void, headers: Headers = {}) {
+        const frame = CLIENT_FRAMES.SUBSCRIBE(destination, headers)
+        const subscriptionId = frame.headers.id.toString()
+        this.subscriptions[subscriptionId] = callback
+        this.sendFrame(frame)
+        return () => this.unsubscribe(subscriptionId)
+    }
+
+    unsubscribe(id: string) {
+        const frame = CLIENT_FRAMES.UNSUBSCRIBE(id)
+        this.sendFrame(frame)
+    }
+
+    begin() { }
+
+    commit() { }
+
+    abort() { }
+
+    ack() { }
+
+    nack() { }
+
+    get connected(): boolean {
+        return this.isConnected
+    }
 }
