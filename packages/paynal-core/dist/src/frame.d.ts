@@ -1,4 +1,4 @@
-/// <reference types="node" />
+import { Buffer } from 'buffer/';
 import type { Headers } from '../@types/headers';
 export declare class Frame {
     readonly command: string;

@@ -1,4 +1,5 @@
 import cuid from 'cuid'
+import { Buffer } from 'buffer/'
 import type { Headers } from '../@types/headers'
 import { Break, Null } from './bytes'
 
@@ -23,7 +24,7 @@ export class Frame {
         if (typeof payload == 'string') payload = Buffer.from(payload)
         const command = Frame.parseCommand(payload)
         const data = payload.subarray(command.length + 1, payload.length)
-        const dataStr = data.toString('utf8', 0, data.length)
+        const dataStr = data.toString().slice(0, data.length)
         const headersAndBody = dataStr.split(`${Break}${Break}`)
         const headers = Frame.parseHeaders(headersAndBody[0])
         const body = headersAndBody.slice(1, headersAndBody.length)

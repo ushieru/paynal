@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Frame = void 0;
 const cuid_1 = __importDefault(require("cuid"));
+const buffer_1 = require("buffer/");
 const bytes_1 = require("./bytes");
 class Frame {
     constructor(command, headers, body, wantReceipt = false) {
@@ -24,10 +25,10 @@ class Frame {
         if (!payload)
             throw 'Payload is empty';
         if (typeof payload == 'string')
-            payload = Buffer.from(payload);
+            payload = buffer_1.Buffer.from(payload);
         const command = Frame.parseCommand(payload);
         const data = payload.subarray(command.length + 1, payload.length);
-        const dataStr = data.toString('utf8', 0, data.length);
+        const dataStr = data.toString().slice(0, data.length);
         const headersAndBody = dataStr.split(`${bytes_1.Break}${bytes_1.Break}`);
         const headers = Frame.parseHeaders(headersAndBody[0]);
         const body = headersAndBody.slice(1, headersAndBody.length);
@@ -38,8 +39,8 @@ class Frame {
         return new Frame(command, headers, Frame.trimNull(body.toString()));
     }
     makeBuffer(headers, body) {
-        const buffers = [Buffer.from(headers), body];
-        return Buffer.concat(buffers);
+        const buffers = [buffer_1.Buffer.from(headers), body];
+        return buffer_1.Buffer.concat(buffers);
     }
     static parseCommand(payload) {
         const payloadStr = payload.toString('utf8', 0, payload.length);
@@ -78,7 +79,7 @@ class Frame {
         frameBuilder.push(headersBuilder.join(bytes_1.Break));
         frameBuilder.push(`${bytes_1.Break}${bytes_1.Break}`);
         if (this.body) {
-            if (Buffer.isBuffer(this.body))
+            if (buffer_1.Buffer.isBuffer(this.body))
                 return this.makeBuffer(frameBuilder.join(bytes_1.Break), this.body);
             else if (typeof this.body == 'string')
                 frameBuilder.push(this.body);

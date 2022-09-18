@@ -10,6 +10,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "cuid": "^2.1.8"
   },
   "devDependencies": {
