@@ -24,6 +24,7 @@ export class Client {
     }
 
     connect(login: string, passcode: string, callback?: (frame: Frame) => void) {
+        if (this.isConnected) throw "You'r allready connected"
         const connectFrame = CLIENT_FRAMES.CONNECT(login, passcode)
         this.connectedCallback = callback
         this.sendFrame(connectFrame)
@@ -36,7 +37,7 @@ export class Client {
     private setupHeartbeat() { }
 
     private parseRequest(data: string | Buffer): void {
-        const frame = Frame.fromPayload(data)
+        const frame = Frame.fromPayload(data as any)
         switch (frame.command) {
             case 'CONNECTED':
                 this.debug()
