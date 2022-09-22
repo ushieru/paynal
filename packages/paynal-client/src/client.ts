@@ -24,7 +24,7 @@ export class Client {
     }
 
     connect(login: string, passcode: string, callback?: (frame: Frame) => void) {
-        if (this.isConnected) throw "You'r allready connected"
+        if (this.isConnected) throw "You'r already connected"
         const connectFrame = CLIENT_FRAMES.CONNECT(login, passcode)
         this.connectedCallback = callback
         this.sendFrame(connectFrame)

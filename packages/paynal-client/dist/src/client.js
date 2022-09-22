@@ -14,6 +14,8 @@ class Client {
         this.heartbeat = (_b = config === null || config === void 0 ? void 0 : config.heartbeat) !== null && _b !== void 0 ? _b : [10000, 10000];
     }
     connect(login, passcode, callback) {
+        if (this.isConnected)
+            throw "You'r already connected";
         const connectFrame = core_1.CLIENT_FRAMES.CONNECT(login, passcode);
         this.connectedCallback = callback;
         this.sendFrame(connectFrame);
