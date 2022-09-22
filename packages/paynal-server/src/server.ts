@@ -42,8 +42,8 @@ export class Server extends EventEmitter {
             this.config.debug('Connect', socket.sessionId)
             socket.on(
                 'message',
-                (data: string) =>
-                    this.parseRequest(socket, data)
+                (data) =>
+                    this.parseRequest(socket, data.toString())
             )
             socket.on(
                 'close',
@@ -108,7 +108,7 @@ export class Server extends EventEmitter {
                 return
             }
         }
-        const frame = Frame.fromPayload(data as any)
+        const frame = Frame.fromPayload(data)
         switch (frame.command) {
             case 'CONNECT':
                 this.webSocketsHandler.CONNECT(socket, frame)
