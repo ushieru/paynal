@@ -29,7 +29,7 @@ class Server extends events_1.default {
             socket.sessionId = (0, cuid_1.default)();
             this.emit('connecting', socket.sessionId);
             this.config.debug('Connect', socket.sessionId);
-            socket.on('message', (data) => this.parseRequest(socket, data));
+            socket.on('message', (data) => this.parseRequest(socket, data.toString()));
             socket.on('close', () => this.disconnectClient(socket));
             socket.on('error', (err) => {
                 this.config.debug(err);
