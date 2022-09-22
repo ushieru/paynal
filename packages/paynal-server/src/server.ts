@@ -42,7 +42,7 @@ export class Server extends EventEmitter {
             this.config.debug('Connect', socket.sessionId)
             socket.on(
                 'message',
-                (data: string | Buffer) =>
+                (data: string) =>
                     this.parseRequest(socket, data)
             )
             socket.on(
@@ -97,7 +97,7 @@ export class Server extends EventEmitter {
         middleware(socket, args)
     }
 
-    private parseRequest(socket: WebSocket, data: string | Buffer): void {
+    private parseRequest(socket: WebSocket, data: string): void {
         // check if it's incoming heartbeat
         if (socket.heartbeatClock) {
             // beat
@@ -108,7 +108,7 @@ export class Server extends EventEmitter {
                 return
             }
         }
-        const frame = Frame.fromPayload(data)
+        const frame = Frame.fromPayload(data as any)
         switch (frame.command) {
             case 'CONNECT':
                 this.webSocketsHandler.CONNECT(socket, frame)
@@ -141,7 +141,7 @@ export class Server extends EventEmitter {
                 if (this.selfSocket.sessionId === subscriber.sessionId) return
                 if (!checkSubMatchDestination(subscriber, topic)) return
                 if (!subscriber.socket) return
-                const frame = SERVER_FRAMES.MESSAGE(subscriber.id, topic, headers, body)
+                const frame = SERVER_FRAMES.MESSAGE(subscriber.id, topic, body, headers)
                 this.emit('send', { topic, frame })
                 this.emit(subscriber.id, frame)
                 subscriber.socket.sendFrame(frame)
@@ -187,7 +187,7 @@ export class Server extends EventEmitter {
 
     subscribeClient(
         socket: WebSocket,
-        args: { dest: string, id: string }
+        args: { destination: string, id: string }
     ) {
         const middleware = this.withMiddleware('subscribe',
             (socket, { destination, id }: { destination: string, id: string }) => {
