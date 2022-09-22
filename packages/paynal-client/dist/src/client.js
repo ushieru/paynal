@@ -60,6 +60,7 @@ class Client {
         const frame = core_1.CLIENT_FRAMES.SUBSCRIBE(destination, headers);
         const subscriptionId = frame.headers.id.toString();
         this.subscriptions[subscriptionId] = callback;
+        console.log('[subscribe]::\n', frame);
         this.sendFrame(frame);
         return () => this.unsubscribe(subscriptionId);
     }

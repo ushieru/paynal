@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { ClientConfig } from "../@types/client-config";
 import { Frame, Headers } from "@paynal/core";
 interface ClientParams {
@@ -22,7 +21,7 @@ export declare class Client {
     private setupHeartbeat;
     private parseRequest;
     private sendFrame;
-    send(destination: string, headers: Headers, body?: string | Buffer): void;
+    send(destination: string, headers: Headers, body?: string): void;
     subscribe(destination: string, callback: (frame: Frame) => void, headers?: Headers): () => void;
     unsubscribe(id: string): void;
     begin(): void;
