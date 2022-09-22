@@ -1,13 +1,13 @@
 import cuid from 'cuid'
-import { Buffer } from 'buffer/'
 import type { Headers } from '../@types/headers'
 import { Break, Null } from './bytes'
+import { trimNull } from './trimNull'
 
 export class Frame {
     constructor(
         readonly command: string,
         readonly headers: Headers,
-        readonly body?: string | Buffer | any,
+        readonly body?: string,
         readonly wantReceipt: boolean = false
     ) {
         if (wantReceipt)
@@ -19,56 +19,20 @@ export class Frame {
             this.headers.receipt = `${cuid()}-${this.headers.session}`
     }
 
-    static fromPayload(payload: Buffer | string): Frame {
+    static fromPayload(payload: string): Frame {
         if (!payload) throw 'Payload is empty'
-        if (typeof payload == 'string') payload = Buffer.from(payload)
-        const command = Frame.parseCommand(payload)
-        const data = payload.subarray(command.length + 1, payload.length)
-        const dataStr = data.toString().slice(0, data.length)
-        const headersAndBody = dataStr.split(`${Break}${Break}`)
-        const headers = Frame.parseHeaders(headersAndBody[0])
-        const body = headersAndBody.slice(1, headersAndBody.length)
-        if ('content-length' in headers) headers.bytes_message = true
-        if (body && headers['content-type'] === 'application/json')
-            return new Frame(command, headers, JSON.parse(Frame.trimNull(body.toString())))
-        return new Frame(command, headers, Frame.trimNull(body.toString()))
-    }
-
-    private makeBuffer(headers: string, body: Buffer): Buffer {
-        const buffers = [Buffer.from(headers), body]
-        return Buffer.concat(buffers)
-    }
-
-    private static parseCommand(payload: Buffer): string {
-        const payloadStr = payload.toString('utf8', 0, payload.length)
-        const command = payloadStr.split(Break)
-        return command[0]
-    }
-
-    private static trimNull(payload: string): string {
-        const c = payload.indexOf(Null)
-        if (c > -1) return payload.slice(0, c)
-        return payload
-    }
-
-    private static parseHeaders(rawHeaders: string): Headers {
+        const [commandAndHeaders, rawBody] = payload.split(`${Break}${Break}`)
+        const [command, ...strHeaders] = commandAndHeaders.split(Break)
+        const body = trimNull(rawBody)
         const headers: Headers = {}
-        const headersSplit = rawHeaders.split(Break)
-        for (let i = 0; i < headersSplit.length; i++) {
-            const header = headersSplit[i].split(':')
-            if (header && header.length > 1) {
-                const key = header.shift()?.trim()
-                if (key) headers[key] = header.join(':').trim()
-                continue
-            }
-            if (header[1]) {
-                headers[header[0].trim()] = header[1].trim()
-            }
-        }
-        return headers
+        strHeaders.forEach(strHeader => {
+            const [key, value] = strHeader.split(':')
+            headers[key] = value
+        })
+        return new Frame(command, headers, body)
     }
 
-    build(): string | Buffer {
+    build(): string {
         const frameBuilder: string[] = []
         const headersBuilder = Object.entries(this.headers)
             .map(([headerKey, headerValue]) =>
@@ -76,14 +40,7 @@ export class Frame {
         frameBuilder.push(`${this.command}${Break}`)
         frameBuilder.push(headersBuilder.join(Break))
         frameBuilder.push(`${Break}${Break}`)
-        if (this.body) {
-            if (Buffer.isBuffer(this.body))
-                return this.makeBuffer(frameBuilder.join(Break), this.body)
-            else if (typeof this.body == 'string')
-                frameBuilder.push(this.body)
-            else if (this.body)
-                frameBuilder.push(JSON.stringify(this.body))
-        }
+        if (this.body) frameBuilder.push(JSON.stringify(this.body))
         frameBuilder.push(Null)
         return frameBuilder.join(Break)
     }
