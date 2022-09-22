@@ -21,6 +21,7 @@ export class Frame {
 
     static fromPayload(payload: string): Frame {
         if (!payload) throw 'Payload is empty'
+        if (typeof payload != 'string') throw 'Payload is not a string'
         const [commandAndHeaders, rawBody] = payload.split(`${Break}${Break}`)
         const [command, ...strHeaders] = commandAndHeaders.split(Break)
         const body = trimNull(rawBody)
