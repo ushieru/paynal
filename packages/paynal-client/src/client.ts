@@ -36,8 +36,8 @@ export class Client {
      */
     private setupHeartbeat() { }
 
-    private parseRequest(data: string | Buffer): void {
-        const frame = Frame.fromPayload(data as any)
+    private parseRequest(data: string): void {
+        const frame = Frame.fromPayload(data)
         switch (frame.command) {
             case 'CONNECTED':
                 this.debug()
@@ -63,7 +63,7 @@ export class Client {
         this.webSocket.send(frame.build())
     }
 
-    send(destination: string, headers: Headers, body?: string | Buffer) {
+    send(destination: string, headers: Headers, body?: string) {
         const frame = CLIENT_FRAMES.SEND(destination, headers, body)
         this.sendFrame(frame)
     }
@@ -72,6 +72,7 @@ export class Client {
         const frame = CLIENT_FRAMES.SUBSCRIBE(destination, headers)
         const subscriptionId = frame.headers.id.toString()
         this.subscriptions[subscriptionId] = callback
+        console.log('[subscribe]::\n', frame)
         this.sendFrame(frame)
         return () => this.unsubscribe(subscriptionId)
     }
