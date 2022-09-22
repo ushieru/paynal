@@ -3,7 +3,7 @@ import { Headers } from '../@types/headers';
 export declare const CLIENT_FRAMES: {
     CONNECT: (login: string, passcode: string) => Frame;
     STOMP: (login: string, passcode: string) => Frame;
-    SEND: (destination: string, headers: Headers, body: any) => Frame;
+    SEND: (destination: string, headers: Headers, body?: string) => Frame;
     SUBSCRIBE: (destination: string, headers: Headers) => Frame;
     UNSUBSCRIBE: (id: string) => Frame;
     BEGIN: (transaction: string, headers: Headers) => Frame;

@@ -22,15 +22,11 @@ class Frame {
             this.headers.receipt = `${(0, cuid_1.default)()}-${this.headers.session}`;
     }
     static fromPayload(payload) {
-        if (!payload)
-            throw 'Payload is empty';
-        if (typeof payload != 'string')
-            throw 'Payload is not a string';
         const [commandAndHeaders, rawBody] = payload.split(`${bytes_1.Break}${bytes_1.Break}`);
         const [command, ...strHeaders] = commandAndHeaders.split(bytes_1.Break);
         const body = (0, trimNull_1.trimNull)(rawBody);
         const headers = {};
-        strHeaders.forEach(strHeader => {
+        strHeaders.forEach((strHeader) => {
             const [key, value] = strHeader.split(':');
             headers[key] = value;
         });
@@ -40,11 +36,11 @@ class Frame {
         const frameBuilder = [];
         const headersBuilder = Object.entries(this.headers)
             .map(([headerKey, headerValue]) => `${headerKey}:${headerValue}`);
-        frameBuilder.push(`${this.command}${bytes_1.Break}`);
+        frameBuilder.push(this.command);
         frameBuilder.push(headersBuilder.join(bytes_1.Break));
-        frameBuilder.push(`${bytes_1.Break}${bytes_1.Break}`);
+        frameBuilder.push(bytes_1.Break);
         if (this.body)
-            frameBuilder.push(JSON.stringify(this.body));
+            frameBuilder.push(this.body);
         frameBuilder.push(bytes_1.Null);
         return frameBuilder.join(bytes_1.Break);
     }
