@@ -41,14 +41,14 @@ class WebSocketsHandler {
     }
     SUBSCRIBE(socket, frame) {
         var _a, _b;
-        const dest = frame.headers.destination.toString();
+        const destination = frame.headers.destination.toString();
         /**
          * The valid values for the ack header are **auto**, **client**, or **client-individual**. If the header is not set, it defaults to auto.
          * Please check [SUBSCRIBE Doc](https://stomp.github.io/stomp-specification-1.2.html#SUBSCRIBE)
          */
         const ack = ((_b = (_a = frame.headers) === null || _a === void 0 ? void 0 : _a.ack) === null || _b === void 0 ? void 0 : _b.toString()) || 'auto';
         this.server.subscribeClient(socket, {
-            dest, id: frame.headers.id.toString()
+            destination, id: frame.headers.id.toString()
         });
     }
     UNSUBSCRIBE(socket, frame) {

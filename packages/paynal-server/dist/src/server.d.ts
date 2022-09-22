@@ -29,7 +29,7 @@ export declare class Server extends EventEmitter {
     addMiddleware(command: Command, handler: Middleware): void;
     private withMiddleware;
     subscribeClient(socket: WebSocket, args: {
-        dest: string;
+        destination: string;
         id: string;
     }): void;
     unsubscribeClient(socket: WebSocket, args: {

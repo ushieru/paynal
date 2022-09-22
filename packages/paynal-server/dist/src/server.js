@@ -113,7 +113,7 @@ class Server extends events_1.default {
                     return;
                 if (!subscriber.socket)
                     return;
-                const frame = core_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, headers, body);
+                const frame = core_1.SERVER_FRAMES.MESSAGE(subscriber.id, topic, body, headers);
                 this.emit('send', { topic, frame });
                 this.emit(subscriber.id, frame);
                 subscriber.socket.sendFrame(frame);
