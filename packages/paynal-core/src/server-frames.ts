@@ -12,7 +12,7 @@ export const SERVER_FRAMES = {
         }
         return new Frame('CONNECTED', headers)
     },
-    MESSAGE: (subscription: string, destination: string, body?: any, headers?: Headers): Frame => {
+    MESSAGE: (subscription: string, destination: string, body?: string, headers?: Headers): Frame => {
         return new Frame('MESSAGE',
             {
                 'message-id': cuid(),

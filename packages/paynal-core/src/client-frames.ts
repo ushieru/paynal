@@ -29,7 +29,7 @@ export const CLIENT_FRAMES = {
         }
         return new Frame('STOMP', headers)
     },
-    SEND: (destination: string, headers: Headers, body: any): Frame => {
+    SEND: (destination: string, headers: Headers, body?: string): Frame => {
         headers.destination = destination
         if (body) headers['content-length'] = body.length
         return new Frame('SEND', headers, body)

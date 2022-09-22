@@ -20,13 +20,11 @@ export class Frame {
     }
 
     static fromPayload(payload: string): Frame {
-        if (!payload) throw 'Payload is empty'
-        if (typeof payload != 'string') throw 'Payload is not a string'
         const [commandAndHeaders, rawBody] = payload.split(`${Break}${Break}`)
         const [command, ...strHeaders] = commandAndHeaders.split(Break)
         const body = trimNull(rawBody)
         const headers: Headers = {}
-        strHeaders.forEach(strHeader => {
+        strHeaders.forEach((strHeader: string) => {
             const [key, value] = strHeader.split(':')
             headers[key] = value
         })
@@ -34,14 +32,14 @@ export class Frame {
     }
 
     build(): string {
-        const frameBuilder: string[] = []
+        const frameBuilder = []
         const headersBuilder = Object.entries(this.headers)
             .map(([headerKey, headerValue]) =>
                 `${headerKey}:${headerValue}`)
-        frameBuilder.push(`${this.command}${Break}`)
+        frameBuilder.push(this.command)
         frameBuilder.push(headersBuilder.join(Break))
-        frameBuilder.push(`${Break}${Break}`)
-        if (this.body) frameBuilder.push(JSON.stringify(this.body))
+        frameBuilder.push(Break)
+        if (this.body) frameBuilder.push(this.body)
         frameBuilder.push(Null)
         return frameBuilder.join(Break)
     }
