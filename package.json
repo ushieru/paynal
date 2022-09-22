@@ -8,5 +8,9 @@
   "license": "MIT",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "happy-dom": "^6.0.4",
+    "jsdom": "^20.0.0"
+  }
 }
