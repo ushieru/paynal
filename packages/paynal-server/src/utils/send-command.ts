@@ -6,7 +6,7 @@ export const sendCommand = (
     socket: WebSocket,
     command: string,
     headers: Headers = {},
-    body: string | Buffer = '',
+    body: string = '',
     wantReceipt: boolean = false
 ): void => {
     if (wantReceipt === true)
